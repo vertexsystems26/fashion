@@ -1,0 +1,1592 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>MAISON NOIR — Agence de Mode</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Bebas+Neue&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --noir: #0a0a0a;
+      --blanc: #f5f0eb;
+      --creme: #e8dfd3;
+      --or: #c9a96e;
+      --or-light: #e8c98a;
+      --gris: #6b6560;
+      --gris-light: #b0a89e;
+      --accent: #8b2635;
+      --font-display: 'Bebas Neue', sans-serif;
+      --font-serif: 'Cormorant Garamond', serif;
+      --font-body: 'DM Sans', sans-serif;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--noir);
+      color: var(--blanc);
+      font-family: var(--font-body);
+      font-weight: 300;
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    /* ── CUSTOM CURSOR ── */
+    .cursor {
+      position: fixed;
+      width: 12px; height: 12px;
+      background: var(--or);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9999;
+      transition: transform 0.1s ease;
+      mix-blend-mode: difference;
+    }
+    .cursor-follower {
+      position: fixed;
+      width: 40px; height: 40px;
+      border: 1px solid var(--or);
+      border-radius: 50%;
+      pointer-events: none;
+      z-index: 9998;
+      transition: all 0.35s cubic-bezier(0.23, 1, 0.32, 1);
+      mix-blend-mode: difference;
+    }
+    .cursor.expand { transform: scale(3); }
+    .cursor-follower.expand { transform: scale(2); opacity: 0.5; }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 28px 60px;
+      mix-blend-mode: difference;
+    }
+    .nav-logo {
+      font-family: var(--font-display);
+      font-size: 1.6rem;
+      letter-spacing: 0.25em;
+      color: var(--blanc);
+      text-decoration: none;
+    }
+    .nav-links {
+      display: flex;
+      gap: 40px;
+      list-style: none;
+    }
+    .nav-links a {
+      font-family: var(--font-body);
+      font-size: 0.72rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--blanc);
+      text-decoration: none;
+      position: relative;
+      opacity: 0.8;
+      transition: opacity 0.3s;
+    }
+    .nav-links a::after {
+      content: '';
+      position: absolute;
+      bottom: -4px; left: 0;
+      width: 0; height: 1px;
+      background: var(--or);
+      transition: width 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+    .nav-links a:hover { opacity: 1; }
+    .nav-links a:hover::after { width: 100%; }
+    .nav-cta {
+      font-family: var(--font-body);
+      font-size: 0.72rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--noir);
+      background: var(--or);
+      border: none;
+      padding: 10px 24px;
+      cursor: none;
+      transition: background 0.3s, transform 0.3s;
+    }
+    .nav-cta:hover { background: var(--or-light); transform: translateY(-2px); }
+
+    /* ── HERO CAROUSEL ── */
+    .hero {
+      position: relative;
+      height: 100vh;
+      overflow: hidden;
+    }
+    .slides-wrapper {
+      position: relative;
+      width: 100%; height: 100%;
+    }
+    .slide {
+      position: absolute;
+      inset: 0;
+      opacity: 0;
+      transition: opacity 1.2s cubic-bezier(0.77, 0, 0.18, 1);
+      overflow: hidden;
+    }
+    .slide.active { opacity: 1; }
+    .slide-bg {
+      position: absolute;
+      inset: 0;
+      background-size: cover;
+      background-position: center;
+      transform: scale(1.08);
+      transition: transform 8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+    .slide.active .slide-bg { transform: scale(1); }
+    .slide-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        135deg,
+        rgba(10,10,10,0.72) 0%,
+        rgba(10,10,10,0.2) 50%,
+        rgba(10,10,10,0.55) 100%
+      );
+    }
+    .slide-content {
+      position: absolute;
+      bottom: 140px;
+      left: 60px;
+      max-width: 680px;
+    }
+    .slide-tag {
+      display: inline-block;
+      font-size: 0.65rem;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      color: var(--or);
+      border: 1px solid var(--or);
+      padding: 5px 14px;
+      margin-bottom: 24px;
+      transform: translateY(30px);
+      opacity: 0;
+      transition: all 0.8s 0.3s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+    .slide-title {
+      font-family: var(--font-display);
+      font-size: clamp(4rem, 9vw, 8rem);
+      line-height: 0.9;
+      letter-spacing: 0.04em;
+      color: var(--blanc);
+      transform: translateY(50px);
+      opacity: 0;
+      transition: all 0.9s 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+    .slide-sub {
+      margin-top: 20px;
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: 1.25rem;
+      color: var(--creme);
+      transform: translateY(30px);
+      opacity: 0;
+      transition: all 0.8s 0.7s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+    .slide-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      margin-top: 36px;
+      font-size: 0.72rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--blanc);
+      text-decoration: none;
+      border-bottom: 1px solid var(--or);
+      padding-bottom: 6px;
+      transform: translateY(30px);
+      opacity: 0;
+      transition: all 0.8s 0.9s cubic-bezier(0.23, 1, 0.32, 1), color 0.3s, border-color 0.3s;
+    }
+    .slide-btn:hover { color: var(--or); }
+    .slide-btn svg { transition: transform 0.3s; }
+    .slide-btn:hover svg { transform: translateX(6px); }
+    .slide.active .slide-tag,
+    .slide.active .slide-title,
+    .slide.active .slide-sub,
+    .slide.active .slide-btn {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Carousel controls */
+    .carousel-controls {
+      position: absolute;
+      bottom: 60px;
+      right: 60px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      z-index: 10;
+    }
+    .carousel-btn {
+      width: 48px; height: 48px;
+      border: 1px solid rgba(245,240,235,0.3);
+      background: transparent;
+      color: var(--blanc);
+      cursor: none;
+      display: flex; align-items: center; justify-content: center;
+      transition: all 0.3s;
+    }
+    .carousel-btn:hover { border-color: var(--or); color: var(--or); }
+    .carousel-dots {
+      display: flex;
+      gap: 10px;
+    }
+    .dot {
+      width: 20px; height: 2px;
+      background: rgba(245,240,235,0.3);
+      cursor: none;
+      transition: all 0.4s;
+    }
+    .dot.active { width: 40px; background: var(--or); }
+    .slide-counter {
+      position: absolute;
+      bottom: 72px;
+      left: 60px;
+      font-family: var(--font-display);
+      font-size: 0.8rem;
+      letter-spacing: 0.2em;
+      color: var(--gris-light);
+    }
+    .slide-counter span { color: var(--or); font-size: 1.2rem; }
+
+    /* Marquee */
+    .marquee-bar {
+      background: var(--or);
+      overflow: hidden;
+      padding: 12px 0;
+      position: relative;
+    }
+    .marquee-track {
+      display: flex;
+      width: max-content;
+      animation: marquee 24s linear infinite;
+    }
+    .marquee-item {
+      font-family: var(--font-display);
+      font-size: 0.85rem;
+      letter-spacing: 0.25em;
+      color: var(--noir);
+      padding: 0 40px;
+    }
+    .marquee-sep { color: var(--noir); opacity: 0.4; }
+    @keyframes marquee {
+      from { transform: translateX(0); }
+      to { transform: translateX(-50%); }
+    }
+
+    /* ── SECTION HEADERS ── */
+    section { padding: 100px 60px; }
+    .section-eyebrow {
+      font-size: 0.65rem;
+      letter-spacing: 0.35em;
+      text-transform: uppercase;
+      color: var(--or);
+      margin-bottom: 14px;
+    }
+    .section-title {
+      font-family: var(--font-display);
+      font-size: clamp(2.5rem, 5vw, 4.5rem);
+      letter-spacing: 0.06em;
+      line-height: 1;
+      color: var(--blanc);
+    }
+    .section-title em {
+      font-family: var(--font-serif);
+      font-style: italic;
+      color: var(--or);
+    }
+    .section-divider {
+      width: 60px; height: 1px;
+      background: var(--or);
+      margin: 28px 0;
+    }
+
+    /* ── FEATURED STRIP ── */
+    .featured {
+      background: #111;
+      padding: 80px 60px;
+    }
+    .featured-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 60px;
+    }
+    .see-all {
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--or);
+      text-decoration: none;
+      border-bottom: 1px solid var(--or);
+      padding-bottom: 4px;
+      transition: opacity 0.3s;
+    }
+    .see-all:hover { opacity: 0.7; }
+
+    /* ── PRODUCT GRID ── */
+    .products { background: var(--noir); padding: 100px 60px; }
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 2px;
+      margin-top: 60px;
+    }
+    .product-card {
+      position: relative;
+      background: #111;
+      overflow: hidden;
+      cursor: none;
+    }
+    .product-card:nth-child(1) { grid-column: span 2; }
+    .product-img-wrap {
+      position: relative;
+      overflow: hidden;
+      aspect-ratio: 3/4;
+    }
+    .product-card:nth-child(1) .product-img-wrap { aspect-ratio: 16/9; }
+    .product-img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.9s cubic-bezier(0.23, 1, 0.32, 1);
+      filter: grayscale(15%);
+    }
+    .product-card:hover .product-img {
+      transform: scale(1.07);
+      filter: grayscale(0%);
+    }
+    .product-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(10,10,10,0.85) 0%, transparent 50%);
+      opacity: 0;
+      transition: opacity 0.5s;
+    }
+    .product-card:hover .product-overlay { opacity: 1; }
+    .product-quick-add {
+      position: absolute;
+      bottom: 80px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--or);
+      color: var(--noir);
+      border: none;
+      padding: 12px 28px;
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      cursor: none;
+      opacity: 0;
+      transition: all 0.4s 0.1s;
+      white-space: nowrap;
+    }
+    .product-card:hover .product-quick-add {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+    .product-badge {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      background: var(--accent);
+      color: var(--blanc);
+      font-size: 0.6rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      padding: 5px 12px;
+    }
+    .product-wishlist {
+      position: absolute;
+      top: 16px; right: 16px;
+      width: 36px; height: 36px;
+      background: rgba(10,10,10,0.6);
+      border: 1px solid rgba(245,240,235,0.2);
+      display: flex; align-items: center; justify-content: center;
+      cursor: none;
+      opacity: 0;
+      transition: all 0.3s;
+      color: var(--blanc);
+    }
+    .product-card:hover .product-wishlist { opacity: 1; }
+    .product-wishlist:hover { background: var(--or); border-color: var(--or); color: var(--noir); }
+    .product-info {
+      padding: 22px 24px 28px;
+    }
+    .product-category {
+      font-size: 0.62rem;
+      letter-spacing: 0.25em;
+      text-transform: uppercase;
+      color: var(--or);
+      margin-bottom: 8px;
+    }
+    .product-name {
+      font-family: var(--font-serif);
+      font-size: 1.25rem;
+      font-weight: 400;
+      color: var(--blanc);
+      margin-bottom: 6px;
+      line-height: 1.3;
+    }
+    .product-desc {
+      font-size: 0.78rem;
+      color: var(--gris-light);
+      margin-bottom: 16px;
+      line-height: 1.6;
+    }
+    .product-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .product-price {
+      font-family: var(--font-display);
+      font-size: 1.4rem;
+      color: var(--blanc);
+      letter-spacing: 0.05em;
+    }
+    .product-price-old {
+      font-family: var(--font-body);
+      font-size: 0.82rem;
+      color: var(--gris);
+      text-decoration: line-through;
+      margin-left: 10px;
+    }
+    .product-sizes {
+      display: flex;
+      gap: 6px;
+    }
+    .size-dot {
+      width: 28px; height: 28px;
+      border: 1px solid rgba(245,240,235,0.2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.6rem;
+      letter-spacing: 0.05em;
+      color: var(--gris-light);
+      transition: all 0.2s;
+      cursor: none;
+    }
+    .size-dot:hover { border-color: var(--or); color: var(--or); }
+
+    /* ── EDITORIAL ── */
+    .editorial {
+      background: #0d0d0d;
+      padding: 0;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      min-height: 600px;
+    }
+    .editorial-visual {
+      position: relative;
+      overflow: hidden;
+    }
+    .editorial-visual img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 1s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+    .editorial-visual:hover img { transform: scale(1.04); }
+    .editorial-visual-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to right, transparent, rgba(13,13,13,0.3));
+    }
+    .editorial-content {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 80px 70px;
+    }
+    .editorial-quote {
+      font-family: var(--font-serif);
+      font-style: italic;
+      font-size: clamp(1.8rem, 3vw, 2.8rem);
+      color: var(--blanc);
+      line-height: 1.4;
+      margin: 28px 0;
+    }
+    .editorial-quote strong { color: var(--or); font-style: normal; }
+    .editorial-author {
+      font-size: 0.72rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gris-light);
+    }
+
+    /* ── SERVICES STRIP ── */
+    .services {
+      background: var(--noir);
+      border-top: 1px solid rgba(245,240,235,0.06);
+      border-bottom: 1px solid rgba(245,240,235,0.06);
+    }
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0;
+    }
+    .service-item {
+      padding: 50px 40px;
+      border-right: 1px solid rgba(245,240,235,0.06);
+      transition: background 0.4s;
+      position: relative;
+      overflow: hidden;
+    }
+    .service-item::before {
+      content: '';
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      height: 2px;
+      background: var(--or);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+    .service-item:hover::before { transform: scaleX(1); }
+    .service-item:hover { background: rgba(201,169,110,0.04); }
+    .service-item:last-child { border-right: none; }
+    .service-icon {
+      width: 44px; height: 44px;
+      margin-bottom: 24px;
+      color: var(--or);
+    }
+    .service-name {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      letter-spacing: 0.08em;
+      color: var(--blanc);
+      margin-bottom: 12px;
+    }
+    .service-desc {
+      font-size: 0.8rem;
+      line-height: 1.7;
+      color: var(--gris-light);
+    }
+
+    /* ── LOOKBOOK MASONRY ── */
+    .lookbook {
+      background: #080808;
+      padding: 100px 60px;
+    }
+    .lookbook-grid {
+      columns: 3;
+      column-gap: 3px;
+      margin-top: 60px;
+    }
+    .lookbook-item {
+      break-inside: avoid;
+      margin-bottom: 3px;
+      position: relative;
+      overflow: hidden;
+      cursor: none;
+    }
+    .lookbook-item img {
+      width: 100%;
+      display: block;
+      transition: transform 0.8s cubic-bezier(0.23, 1, 0.32, 1), filter 0.5s;
+      filter: grayscale(20%) brightness(0.9);
+    }
+    .lookbook-item:hover img {
+      transform: scale(1.05);
+      filter: grayscale(0%) brightness(1);
+    }
+    .lookbook-item-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(10,10,10,0.5);
+      opacity: 0;
+      transition: opacity 0.4s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .lookbook-item:hover .lookbook-item-overlay { opacity: 1; }
+    .lookbook-expand {
+      width: 52px; height: 52px;
+      border: 1px solid var(--blanc);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--blanc);
+      transform: scale(0.7);
+      transition: transform 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+    .lookbook-item:hover .lookbook-expand { transform: scale(1); }
+
+    /* ── NEWSLETTER ── */
+    .newsletter {
+      background: var(--or);
+      padding: 80px 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 60px;
+    }
+    .newsletter-left .section-eyebrow { color: rgba(10,10,10,0.6); }
+    .newsletter-left .section-title { color: var(--noir); }
+    .newsletter-left .section-title em { color: rgba(10,10,10,0.7); }
+    .newsletter-form {
+      flex: 0 0 500px;
+      display: flex;
+      gap: 0;
+    }
+    .newsletter-input {
+      flex: 1;
+      background: rgba(10,10,10,0.12);
+      border: 1px solid rgba(10,10,10,0.25);
+      border-right: none;
+      padding: 16px 24px;
+      color: var(--noir);
+      font-family: var(--font-body);
+      font-size: 0.85rem;
+      outline: none;
+    }
+    .newsletter-input::placeholder { color: rgba(10,10,10,0.5); }
+    .newsletter-submit {
+      background: var(--noir);
+      color: var(--or);
+      border: none;
+      padding: 16px 30px;
+      font-family: var(--font-display);
+      font-size: 0.9rem;
+      letter-spacing: 0.15em;
+      cursor: none;
+      transition: background 0.3s;
+    }
+    .newsletter-submit:hover { background: #1a1a1a; }
+
+    /* ── BRANDS ── */
+    .brands {
+      background: var(--noir);
+      padding: 60px;
+      border-top: 1px solid rgba(245,240,235,0.06);
+    }
+    .brands-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 40px;
+    }
+    .brand-logo {
+      font-family: var(--font-display);
+      font-size: clamp(1rem, 1.5vw, 1.4rem);
+      letter-spacing: 0.25em;
+      color: rgba(245,240,235,0.2);
+      transition: color 0.4s;
+      cursor: none;
+      white-space: nowrap;
+    }
+    .brand-logo:hover { color: var(--or); }
+
+    /* ── FOOTER ── */
+    footer {
+      background: #050505;
+      padding: 80px 60px 40px;
+      border-top: 1px solid rgba(245,240,235,0.06);
+    }
+    .footer-top {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr;
+      gap: 60px;
+      margin-bottom: 60px;
+    }
+    .footer-brand .nav-logo { display: block; margin-bottom: 20px; font-size: 2rem; }
+    .footer-brand p {
+      font-size: 0.82rem;
+      line-height: 1.8;
+      color: var(--gris-light);
+      max-width: 280px;
+    }
+    .footer-socials {
+      display: flex;
+      gap: 14px;
+      margin-top: 28px;
+    }
+    .footer-social {
+      width: 38px; height: 38px;
+      border: 1px solid rgba(245,240,235,0.15);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--gris-light);
+      text-decoration: none;
+      transition: all 0.3s;
+      cursor: none;
+    }
+    .footer-social:hover { border-color: var(--or); color: var(--or); }
+    .footer-col h4 {
+      font-family: var(--font-display);
+      font-size: 0.85rem;
+      letter-spacing: 0.2em;
+      color: var(--blanc);
+      margin-bottom: 24px;
+    }
+    .footer-links { list-style: none; }
+    .footer-links li { margin-bottom: 12px; }
+    .footer-links a {
+      font-size: 0.8rem;
+      color: var(--gris-light);
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+    .footer-links a:hover { color: var(--or); }
+    .footer-bottom {
+      border-top: 1px solid rgba(245,240,235,0.06);
+      padding-top: 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .footer-bottom p {
+      font-size: 0.72rem;
+      color: var(--gris);
+      letter-spacing: 0.1em;
+    }
+    .footer-bottom-links {
+      display: flex;
+      gap: 30px;
+      list-style: none;
+    }
+    .footer-bottom-links a {
+      font-size: 0.72rem;
+      color: var(--gris);
+      text-decoration: none;
+      transition: color 0.3s;
+    }
+    .footer-bottom-links a:hover { color: var(--or); }
+
+    /* ── SCROLL REVEAL ── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 0.9s cubic-bezier(0.23, 1, 0.32, 1),
+                  transform 0.9s cubic-bezier(0.23, 1, 0.32, 1);
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .reveal-delay-1 { transition-delay: 0.1s; }
+    .reveal-delay-2 { transition-delay: 0.2s; }
+    .reveal-delay-3 { transition-delay: 0.3s; }
+    .reveal-delay-4 { transition-delay: 0.4s; }
+
+    /* ── SCROLL PROGRESS ── */
+    .scroll-progress {
+      position: fixed;
+      top: 0; left: 0;
+      height: 2px;
+      background: var(--or);
+      z-index: 10000;
+      transition: width 0.1s;
+    }
+
+    /* ── PAGE LOADER ── */
+    .loader {
+      position: fixed;
+      inset: 0;
+      background: var(--noir);
+      z-index: 99999;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+    }
+    .loader-logo {
+      font-family: var(--font-display);
+      font-size: 3rem;
+      letter-spacing: 0.4em;
+      color: var(--blanc);
+      animation: fadeGlow 1.5s ease-in-out infinite alternate;
+    }
+    @keyframes fadeGlow {
+      from { opacity: 0.3; }
+      to { opacity: 1; }
+    }
+    .loader-bar-wrap {
+      width: 200px; height: 1px;
+      background: rgba(245,240,235,0.15);
+      position: relative;
+      overflow: hidden;
+    }
+    .loader-bar {
+      position: absolute;
+      left: 0; top: 0; height: 100%;
+      background: var(--or);
+      animation: loadBar 1.8s cubic-bezier(0.77, 0, 0.18, 1) forwards;
+    }
+    @keyframes loadBar {
+      from { width: 0; }
+      to { width: 100%; }
+    }
+    .loader.hidden {
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.8s;
+    }
+
+    /* Fake image placeholders (colored gradients as stand-ins) */
+    .img-fashion-1 { background: linear-gradient(135deg, #1a1008 0%, #3d2b0a 40%, #2a1c06 100%); }
+    .img-fashion-2 { background: linear-gradient(135deg, #0f0f14 0%, #1e1830 40%, #120f20 100%); }
+    .img-fashion-3 { background: linear-gradient(135deg, #0e1309 0%, #1a2210 40%, #0b110a 100%); }
+    .img-fashion-4 { background: linear-gradient(135deg, #150808 0%, #2e1010 40%, #1a0a0a 100%); }
+    .img-product-1 { background: linear-gradient(160deg, #1c1408 0%, #38280a 100%); }
+    .img-product-2 { background: linear-gradient(160deg, #0d0d15 0%, #1a1830 100%); }
+    .img-product-3 { background: linear-gradient(160deg, #0a1208 0%, #162010 100%); }
+    .img-product-4 { background: linear-gradient(160deg, #140808 0%, #281210 100%); }
+    .img-product-5 { background: linear-gradient(160deg, #0f100a 0%, #1e1e12 100%); }
+    .img-product-6 { background: linear-gradient(160deg, #120e0e 0%, #241818 100%); }
+
+    /* Fake fashion silhouette SVGs inside placeholders */
+    .placeholder-figure {
+      width: 100%; height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .placeholder-figure svg { opacity: 0.15; }
+
+    /* Notification toast */
+    .toast {
+      position: fixed;
+      bottom: 40px;
+      right: 40px;
+      background: #1a1a1a;
+      border: 1px solid var(--or);
+      color: var(--blanc);
+      padding: 16px 24px;
+      font-size: 0.8rem;
+      letter-spacing: 0.05em;
+      z-index: 5000;
+      transform: translateY(20px) scale(0.95);
+      opacity: 0;
+      transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+      pointer-events: none;
+    }
+    .toast.show { transform: translateY(0) scale(1); opacity: 1; }
+    .toast span { color: var(--or); font-weight: 500; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 1024px) {
+      nav { padding: 22px 30px; }
+      section { padding: 70px 30px; }
+      .editorial { grid-template-columns: 1fr; }
+      .editorial-visual { height: 400px; }
+      .footer-top { grid-template-columns: 1fr 1fr; }
+      .services-grid { grid-template-columns: 1fr 1fr; }
+      .lookbook-grid { columns: 2; }
+      .product-card:nth-child(1) { grid-column: span 1; }
+    }
+    @media (max-width: 700px) {
+      nav { padding: 18px 20px; }
+      .nav-links, .nav-cta { display: none; }
+      .slide-content { left: 20px; bottom: 100px; }
+      .carousel-controls { right: 20px; bottom: 30px; }
+      .slide-counter { left: 20px; bottom: 42px; }
+      section { padding: 60px 20px; }
+      .services-grid { grid-template-columns: 1fr; }
+      .newsletter { flex-direction: column; }
+      .newsletter-form { flex: none; width: 100%; }
+      .footer-top { grid-template-columns: 1fr; gap: 36px; }
+      .brands-row { flex-wrap: wrap; justify-content: center; }
+      .lookbook-grid { columns: 2; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- CURSOR -->
+<div class="cursor" id="cursor"></div>
+<div class="cursor-follower" id="cursorFollower"></div>
+
+<!-- SCROLL PROGRESS -->
+<div class="scroll-progress" id="scrollProgress"></div>
+
+<!-- LOADER -->
+<div class="loader" id="loader">
+  <div class="loader-logo">MAISON NOIR</div>
+  <div class="loader-bar-wrap"><div class="loader-bar"></div></div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">Article ajouté au panier — <span>voir le panier</span></div>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">MAISON NOIR</a>
+  <ul class="nav-links">
+    <li><a href="#collections">Collections</a></li>
+    <li><a href="#products">Boutique</a></li>
+    <li><a href="#lookbook">Lookbook</a></li>
+    <li><a href="#editorial">Éditorial</a></li>
+    <li><a href="#footer">Contact</a></li>
+  </ul>
+  <button class="nav-cta">Réserver un RDV</button>
+</nav>
+
+<!-- ════════════════════════════════════
+     HERO CAROUSEL
+════════════════════════════════════ -->
+<section class="hero" id="hero">
+  <div class="slides-wrapper" id="slidesWrapper">
+
+    <!-- SLIDE 1 -->
+    <div class="slide active" data-index="0">
+      <div class="slide-bg img-fashion-1">
+        <div class="placeholder-figure">
+          <img src="1.png">
+        </div>
+      </div>
+      <div class="slide-overlay"></div>
+      <div class="slide-content">
+        <span class="slide-tag">Nouvelle Collection SS25</span>
+        <h1 class="slide-title">L'ART DU<br>VÊTEMENT</h1>
+        <p class="slide-sub">Où l'élégance rencontre l'avant-garde — une ode à la mode intemporelle.</p>
+        <a href="#products" class="slide-btn">Découvrir <svg width="20" height="10" viewBox="0 0 20 10"><path d="M0 5h18M13 1l6 4-6 4" stroke="currentColor" stroke-width="1.2" fill="none"/></svg></a>
+      </div>
+    </div>
+
+    <!-- SLIDE 2 -->
+    <div class="slide" data-index="1">
+      <div class="slide-bg img-fashion-2">
+        <div class="placeholder-figure">
+          <img src="2.png">
+        </div>
+      </div>
+      <div class="slide-overlay"></div>
+      <div class="slide-content">
+        <span class="slide-tag">Offre Exclusive — 30% de réduction</span>
+        <h1 class="slide-title">COUTURE<br>NOCTURNE</h1>
+        <p class="slide-sub">La nuit appartient à ceux qui osent — explorez notre éditorial nuit.</p>
+        <a href="#products" class="slide-btn">Voir l'offre <svg width="20" height="10" viewBox="0 0 20 10"><path d="M0 5h18M13 1l6 4-6 4" stroke="currentColor" stroke-width="1.2" fill="none"/></svg></a>
+      </div>
+    </div>
+
+    <!-- SLIDE 3 -->
+    <div class="slide" data-index="2">
+      <div class="slide-bg img-fashion-3">
+        <div class="placeholder-figure">
+          <img src="3.png">
+        </div>
+      </div>
+      <div class="slide-overlay"></div>
+      <div class="slide-content">
+        <span class="slide-tag">Capsule Collection — Printemps 2025</span>
+        <h1 class="slide-title">NATURE<br>SAUVAGE</h1>
+        <p class="slide-sub">Inspirée de la forêt, sculptée pour la ville — une collection qui respire.</p>
+        <a href="#products" class="slide-btn">Explorer <svg width="20" height="10" viewBox="0 0 20 10"><path d="M0 5h18M13 1l6 4-6 4" stroke="currentColor" stroke-width="1.2" fill="none"/></svg></a>
+      </div>
+    </div>
+
+    <!-- SLIDE 4 -->
+    <div class="slide" data-index="3">
+      <div class="slide-bg img-fashion-4">
+        <div class="placeholder-figure">
+          <img src="4.png">
+        </div>
+      </div>
+      <div class="slide-overlay"></div>
+      <div class="slide-content">
+        <span class="slide-tag">Vente Flash — Ce Weekend Seulement</span>
+        <h1 class="slide-title">ROUGE<br>PASSION</h1>
+        <p class="slide-sub">L'intensité dans chaque fil — des pièces qui font battre le cœur plus vite.</p>
+        <a href="#products" class="slide-btn">Profiter <svg width="20" height="10" viewBox="0 0 20 10"><path d="M0 5h18M13 1l6 4-6 4" stroke="currentColor" stroke-width="1.2" fill="none"/></svg></a>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Controls -->
+  <div class="slide-counter"><span id="currentSlide">01</span> / 04</div>
+  <div class="carousel-controls">
+    <div class="carousel-dots" id="carouselDots">
+      <div class="dot active"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+      <div class="dot"></div>
+    </div>
+    <button class="carousel-btn" id="prevBtn" aria-label="Précédent">
+      <svg width="18" height="10" viewBox="0 0 18 10" fill="none"><path d="M18 5H0M5 1L0 5l5 4" stroke="currentColor" stroke-width="1.2"/></svg>
+    </button>
+    <button class="carousel-btn" id="nextBtn" aria-label="Suivant">
+      <svg width="18" height="10" viewBox="0 0 18 10" fill="none"><path d="M0 5h18M13 1l5 4-5 4" stroke="currentColor" stroke-width="1.2"/></svg>
+    </button>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="marquee-bar">
+  <div class="marquee-track">
+    <span class="marquee-item">NOUVELLE COLLECTION SS25</span>
+    <span class="marquee-item marquee-sep">✦</span>
+    <span class="marquee-item">LIVRAISON GRATUITE DÈS 150€</span>
+    <span class="marquee-item marquee-sep">✦</span>
+    <span class="marquee-item">VENTE EXCLUSIVE MEMBRES</span>
+    <span class="marquee-item marquee-sep">✦</span>
+    <span class="marquee-item">CAPSULE COLLECTION LIMITÉE</span>
+    <span class="marquee-item marquee-sep">✦</span>
+    <span class="marquee-item">FAÇONNÉ AVEC EXCELLENCE</span>
+    <span class="marquee-item marquee-sep">✦</span>
+    <span class="marquee-item">NOUVELLE COLLECTION SS25</span>
+    <span class="marquee-item marquee-sep">✦</span>
+    <span class="marquee-item">LIVRAISON GRATUITE DÈS 150€</span>
+    <span class="marquee-item marquee-sep">✦</span>
+    <span class="marquee-item">VENTE EXCLUSIVE MEMBRES</span>
+    <span class="marquee-item marquee-sep">✦</span>
+    <span class="marquee-item">CAPSULE COLLECTION LIMITÉE</span>
+    <span class="marquee-item marquee-sep">✦</span>
+    <span class="marquee-item">FAÇONNÉ AVEC EXCELLENCE</span>
+    <span class="marquee-item marquee-sep">✦</span>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════
+     PRODUCTS
+════════════════════════════════════ -->
+<section class="products" id="products">
+  <div class="featured-header reveal">
+    <div>
+      <p class="section-eyebrow">Notre boutique</p>
+      <h2 class="section-title">PIÈCES <em>Signature</em></h2>
+    </div>
+    <a href="#" class="see-all">Voir tout →</a>
+  </div>
+
+  <div class="product-grid">
+
+    <!-- Card 1 — featured -->
+    <div class="product-card reveal">
+      <div class="product-img-wrap">
+        <div class="product-img img-product-1" style="width:100%;height:100%;">
+          <div class="placeholder-figure">
+            <img src="2.png">
+                      </div>
+        </div>
+        <div class="product-overlay"></div>
+        <div class="product-badge">Édition Limitée</div>
+        <button class="product-wishlist" onclick="addWishlist(event)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        </button>
+        <button class="product-quick-add" onclick="addToCart(event, 'Manteau Obsidienne')">Ajouter au Panier</button>
+      </div>
+      <div class="product-info">
+        <p class="product-category">Manteaux & Vestes</p>
+        <h3 class="product-name">Manteau Obsidienne Oversize</h3>
+        <p class="product-desc">Laine mérinos double-face, coupe architecturale. La pièce maîtresse de la saison.</p>
+        <div class="product-footer">
+          <div>
+            <span class="product-price">890 €</span>
+            <span class="product-price-old">1 200 €</span>
+          </div>
+          <div class="product-sizes">
+            <div class="size-dot">XS</div>
+            <div class="size-dot">S</div>
+            <div class="size-dot">M</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 2 -->
+    <div class="product-card reveal reveal-delay-1">
+      <div class="product-img-wrap">
+        <div class="product-img img-product-2" style="width:100%;height:100%;">
+          <div class="placeholder-figure">
+            <img src="1.png">
+          </div>
+        </div>
+        <div class="product-overlay"></div>
+        <button class="product-wishlist" onclick="addWishlist(event)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        </button>
+        <button class="product-quick-add" onclick="addToCart(event, 'Robe Minuit')">Ajouter au Panier</button>
+      </div>
+      <div class="product-info">
+        <p class="product-category">Robes</p>
+        <h3 class="product-name">Robe Minuit en Soie</h3>
+        <p class="product-desc">Soie de Côme, drapé asymétrique, fermeture invisible dans le dos.</p>
+        <div class="product-footer">
+          <div><span class="product-price">540 €</span></div>
+          <div class="product-sizes">
+            <div class="size-dot">S</div>
+            <div class="size-dot">M</div>
+            <div class="size-dot">L</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+    <!-- Card 3 -->
+    <div class="product-card reveal reveal-delay-1">
+      <div class="product-img-wrap">
+        <div class="product-img img-product-3" style="width:100%;height:100%;">
+          <div class="placeholder-figure">
+            <img src="3.png">
+          </div>
+        </div>
+        <div class="product-overlay"></div>
+        <div class="product-badge">Nouveau</div>
+        <button class="product-wishlist" onclick="addWishlist(event)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        </button>
+        <button class="product-quick-add" onclick="addToCart(event, 'Blazer Structuré')">Ajouter au Panier</button>
+      </div>
+      <div class="product-info">
+        <p class="product-category">Blazers</p>
+        <h3 class="product-name">Blazer Structuré Kaki</h3>
+        <p class="product-desc">Tissu technique japonais, épaules sculptées, doublure satinée contrastante.</p>
+        <div class="product-footer">
+          <div><span class="product-price">620 €</span></div>
+          <div class="product-sizes">
+            <div class="size-dot">XS</div>
+            <div class="size-dot">S</div>
+            <div class="size-dot">M</div>
+            <div class="size-dot">L</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 4 -->
+    <div class="product-card reveal reveal-delay-1">
+      <div class="product-img-wrap">
+        <div class="product-img img-product-4" style="width:100%;height:100%;">
+          <div class="placeholder-figure">
+            <img src="4.png">
+          </div>
+        </div>
+        <div class="product-overlay"></div>
+        <button class="product-wishlist" onclick="addWishlist(event)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        </button>
+        <button class="product-quick-add" onclick="addToCart(event, 'Pull Cachemire')">Ajouter au Panier</button>
+      </div>
+      <div class="product-info">
+        <p class="product-category">Knitwear</p>
+        <h3 class="product-name">Pull Cachemire Bordeaux</h3>
+        <p class="product-desc">Cachemire grade A, col en V profond, coupe relaxée contemporaine.</p>
+        <div class="product-footer">
+          <div>
+            <span class="product-price">380 €</span>
+            <span class="product-price-old">480 €</span>
+          </div>
+          <div class="product-sizes">
+            <div class="size-dot">S</div>
+            <div class="size-dot">M</div>
+            <div class="size-dot">L</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 5 -->
+    <div class="product-card reveal reveal-delay-2">
+      <div class="product-img-wrap">
+        <div class="product-img img-product-5" >
+          <img src="5.png">
+        </div>
+        <div class="product-overlay"></div>
+        <div class="product-badge">Bestseller</div>
+        <button class="product-wishlist" onclick="addWishlist(event)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        </button>
+        <button class="product-quick-add" onclick="addToCart(event, 'Jupe Plissée')">Ajouter au Panier</button>
+      </div>
+      <div class="product-info">
+        <p class="product-category">Jupes</p>
+        <h3 class="product-name">Jupe Plissée Ivoire</h3>
+        <p class="product-desc">Polyester technique plissé permanent, longueur midi, taille élastiquée discrète.</p>
+        <div class="product-footer">
+          <div><span class="product-price">280 €</span></div>
+          <div class="product-sizes">
+            <div class="size-dot">XS</div>
+            <div class="size-dot">S</div>
+            <div class="size-dot">M</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Card 6 -->
+    <div class="product-card reveal reveal-delay-3">
+      <div class="product-img-wrap">
+        <div class="product-img img-product-6" style="width:100%;height:100%;">
+          <div class="placeholder-figure">
+            <img src="6.png">
+          </div>
+        </div>
+        <div class="product-overlay"></div>
+        <button class="product-wishlist" onclick="addWishlist(event)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78L12 21.23l8.84-8.84a5.5 5.5 0 0 0 0-7.78z"/></svg>
+        </button>
+        <button class="product-quick-add" onclick="addToCart(event, 'Sac Cuir Noir')">Ajouter au Panier</button>
+      </div>
+      <div class="product-info">
+        <p class="product-category">Accessoires</p>
+        <h3 class="product-name">Sac Cuir Pleine Fleur</h3>
+        <p class="product-desc">Cuir végétal tanné, quincaillerie dorée 24k, compartiments structurés.</p>
+        <div class="product-footer">
+          <div><span class="product-price">720 €</span></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ════════════════════════════════════
+     EDITORIAL
+════════════════════════════════════ -->
+<div class="editorial" id="editorial">
+  <div class="editorial-visual">
+    <div class="img-fashion-2" style="width:100%;height:100%;min-height:500px;display:flex;align-items:center;justify-content:center;">
+      <svg viewBox="0 0 300 500" fill="none" width="180" opacity="0.12">
+        <ellipse cx="150" cy="80" rx="48" ry="58" fill="#c9a96e"/>
+        <path d="M80 185 Q115 145 150 140 Q185 145 220 185 L250 500 L50 500 Z" fill="#c9a96e"/>
+        <rect x="38" y="180" width="50" height="130" rx="25" fill="#c9a96e"/>
+        <rect x="212" y="180" width="50" height="130" rx="25" fill="#c9a96e"/>
+      </svg>
+    </div>
+    <div class="editorial-visual-overlay"></div>
+  </div>
+  <div class="editorial-content reveal">
+    <p class="section-eyebrow">Notre vision</p>
+    <div class="section-divider"></div>
+    <blockquote class="editorial-quote">
+      "La mode est une armure pour affronter la vie quotidienne — nous créons des <strong>boucliers magnifiques</strong>."
+    </blockquote>
+    <p class="editorial-author">— Élise Marchand, Directrice Artistique</p>
+    <div style="margin-top:40px;">
+      <a href="#" class="slide-btn" style="opacity:1;transform:none;">
+        Lire l'éditorial complet
+        <svg width="20" height="10" viewBox="0 0 20 10"><path d="M0 5h18M13 1l6 4-6 4" stroke="currentColor" stroke-width="1.2" fill="none"/></svg>
+      </a>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════
+     SERVICES
+════════════════════════════════════ -->
+<section class="services" id="collections">
+  <div class="services-grid">
+    <div class="service-item reveal">
+      <svg class="service-icon" viewBox="0 0 44 44" fill="none" stroke="currentColor" stroke-width="1.2">
+        <circle cx="22" cy="22" r="18"/>
+        <path d="M22 8v28M8 22h28"/>
+        <circle cx="22" cy="22" r="6"/>
+      </svg>
+      <div class="service-name">STYLISME PRIVÉ</div>
+      <p class="service-desc">Un conseiller dédié vous accompagne dans la création de votre garde-robe capsule, pensée pour votre lifestyle.</p>
+    </div>
+    <div class="service-item reveal reveal-delay-1">
+      <svg class="service-icon" viewBox="0 0 44 44" fill="none" stroke="currentColor" stroke-width="1.2">
+        <rect x="8" y="12" width="28" height="22" rx="2"/>
+        <path d="M8 18h28M16 8v4M28 8v4"/>
+      </svg>
+      <div class="service-name">LOCATION PIÈCES</div>
+      <p class="service-desc">Accédez à notre collection de haute couture pour vos événements. Tarifs journaliers et hebdomadaires disponibles.</p>
+    </div>
+    <div class="service-item reveal reveal-delay-2">
+      <svg class="service-icon" viewBox="0 0 44 44" fill="none" stroke="currentColor" stroke-width="1.2">
+        <path d="M22 6L8 16v22h28V16L22 6z"/>
+        <path d="M16 38V26h12v12"/>
+        <circle cx="22" cy="20" r="3"/>
+      </svg>
+      <div class="service-name">RETOUCHES SUR MESURE</div>
+      <p class="service-desc">Notre atelier de couture adapte chaque pièce à votre morphologie avec une précision artisanale française.</p>
+    </div>
+    <div class="service-item reveal reveal-delay-3">
+      <svg class="service-icon" viewBox="0 0 44 44" fill="none" stroke="currentColor" stroke-width="1.2">
+        <path d="M10 22l8 8 16-16"/>
+        <circle cx="22" cy="22" r="16"/>
+      </svg>
+      <div class="service-name">LIVRAISON PREMIUM</div>
+      <p class="service-desc">Livraison sous 24h en boîte signature avec emballage cadeau personnalisé et message manuscrit offert.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════
+     LOOKBOOK
+════════════════════════════════════ -->
+<section class="lookbook" id="lookbook">
+  <div class="featured-header reveal">
+    <div>
+      <p class="section-eyebrow">Galerie</p>
+      <h2 class="section-title">LOOKBOOK <em>SS25</em></h2>
+    </div>
+    <a href="#" class="see-all">Galerie complète →</a>
+  </div>
+  <div class="lookbook-grid">
+    <div class="lookbook-item reveal">
+      <div style="background:linear-gradient(160deg,#1a1408,#3d2b0a);aspect-ratio:2/3;display:flex;align-items:center;justify-content:center;">
+        <svg viewBox="0 0 200 350" fill="none" width="80" opacity="0.15">
+          <ellipse cx="100" cy="60" rx="38" ry="45" fill="#c9a96e"/>
+          <path d="M55 140 Q78 118 100 115 Q122 118 145 140 L155 350 L45 350 Z" fill="#c9a96e"/>
+        </svg>
+      </div>
+      <div class="lookbook-item-overlay"><div class="lookbook-expand"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></div></div>
+    </div>
+    <div class="lookbook-item reveal reveal-delay-1">
+      <div style="background:linear-gradient(160deg,#0d0d15,#1e1830);aspect-ratio:3/4;display:flex;align-items:center;justify-content:center;">
+        <svg viewBox="0 0 200 280" fill="none" width="100" opacity="0.12">
+          <path d="M30 0 L100 20 L170 0 L180 280 L20 280 Z" fill="#c9a96e"/>
+        </svg>
+      </div>
+      <div class="lookbook-item-overlay"><div class="lookbook-expand"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></div></div>
+    </div>
+    <div class="lookbook-item reveal reveal-delay-2">
+      <div style="background:linear-gradient(160deg,#0e1309,#1a2210);aspect-ratio:1/1;display:flex;align-items:center;justify-content:center;">
+        <svg viewBox="0 0 200 200" fill="none" width="80" opacity="0.12">
+          <circle cx="100" cy="100" r="80" fill="none" stroke="#c9a96e" stroke-width="2"/>
+          <path d="M60 100 Q100 40 140 100 Q100 160 60 100Z" fill="#c9a96e"/>
+        </svg>
+      </div>
+      <div class="lookbook-item-overlay"><div class="lookbook-expand"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></div></div>
+    </div>
+    <div class="lookbook-item reveal">
+      <div style="background:linear-gradient(160deg,#150808,#2e1010);aspect-ratio:2/3;display:flex;align-items:center;justify-content:center;">
+        <svg viewBox="0 0 200 350" fill="none" width="80" opacity="0.15">
+          <ellipse cx="100" cy="65" rx="40" ry="50" fill="#c9a96e"/>
+          <path d="M55 145 L100 130 L145 145 L130 350 L70 350 Z" fill="#c9a96e"/>
+          <rect x="40" y="143" width="25" height="90" rx="12" fill="#c9a96e"/>
+          <rect x="135" y="143" width="25" height="90" rx="12" fill="#c9a96e"/>
+        </svg>
+      </div>
+      <div class="lookbook-item-overlay"><div class="lookbook-expand"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></div></div>
+    </div>
+    <div class="lookbook-item reveal reveal-delay-1">
+      <div style="background:linear-gradient(160deg,#0f0f14,#1e1830);aspect-ratio:4/5;display:flex;align-items:center;justify-content:center;">
+        <svg viewBox="0 0 200 300" fill="none" width="90" opacity="0.12">
+          <rect x="40" y="20" width="120" height="260" rx="12" fill="#c9a96e"/>
+          <rect x="30" y="50" width="20" height="70" rx="10" fill="#c9a96e"/>
+          <rect x="150" y="50" width="20" height="70" rx="10" fill="#c9a96e"/>
+        </svg>
+      </div>
+      <div class="lookbook-item-overlay"><div class="lookbook-expand"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></div></div>
+    </div>
+    <div class="lookbook-item reveal reveal-delay-2">
+      <div style="background:linear-gradient(160deg,#120e0e,#241818);aspect-ratio:3/4;display:flex;align-items:center;justify-content:center;">
+        <svg viewBox="0 0 200 300" fill="none" width="90" opacity="0.12">
+          <path d="M100 20 L170 80 L150 280 L50 280 L30 80 Z" fill="#c9a96e"/>
+          <ellipse cx="100" cy="20" rx="35" ry="30" fill="#9a7340"/>
+        </svg>
+      </div>
+      <div class="lookbook-item-overlay"><div class="lookbook-expand"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"/></svg></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════
+     BRANDS
+════════════════════════════════════ -->
+<div class="brands reveal">
+  <p class="section-eyebrow" style="text-align:center;margin-bottom:40px;">Nos partenaires créateurs</p>
+  <div class="brands-row">
+    <div class="brand-logo">LUMIÈRE</div>
+    <div class="brand-logo">VELOURS</div>
+    <div class="brand-logo">SOIRÉE</div>
+    <div class="brand-logo">ARTISAN CO.</div>
+    <div class="brand-logo">DRAPÉ</div>
+    <div class="brand-logo">NACRE</div>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════
+     NEWSLETTER
+════════════════════════════════════ -->
+<div class="newsletter reveal">
+  <div class="newsletter-left">
+    <p class="section-eyebrow">Restez connecté</p>
+    <h2 class="section-title">ACCÈS <em>Prioritaire</em></h2>
+    <p style="margin-top:12px;font-size:0.82rem;color:rgba(10,10,10,0.65);">Pré-ventes, collections capsule, événements exclusifs.</p>
+  </div>
+  <div class="newsletter-form">
+    <input class="newsletter-input" type="email" placeholder="votre@email.com" id="emailInput"/>
+    <button class="newsletter-submit" onclick="subscribeNewsletter()">S'INSCRIRE</button>
+  </div>
+</div>
+
+<!-- ════════════════════════════════════
+     FOOTER
+════════════════════════════════════ -->
+<footer id="footer">
+  <div class="footer-top">
+    <div class="footer-brand">
+      <a href="#" class="nav-logo">MAISON NOIR</a>
+      <p>Une agence de mode fondée sur l'excellence artisanale et le design contemporain. Nous habillons ceux qui refusent de passer inaperçus.</p>
+      <div class="footer-socials">
+        <a href="#" class="footer-social" aria-label="Instagram">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor"/></svg>
+        </a>
+        <a href="#" class="footer-social" aria-label="Pinterest">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 2C6.48 2 2 6.48 2 12c0 4.24 2.65 7.86 6.39 9.29-.09-.78-.17-1.98.04-2.83.18-.77 1.22-5.17 1.22-5.17s-.31-.62-.31-1.54c0-1.45.84-2.53 1.88-2.53.89 0 1.32.67 1.32 1.47 0 .9-.57 2.24-.86 3.48-.25 1.04.51 1.88 1.53 1.88 1.83 0 3.24-1.93 3.24-4.72 0-2.47-1.78-4.19-4.32-4.19-2.94 0-4.67 2.2-4.67 4.49 0 .89.34 1.84.77 2.36.08.1.09.19.07.29-.08.32-.25 1.04-.28 1.18-.04.19-.13.23-.3.14-1.13-.53-1.84-2.18-1.84-3.51 0-2.85 2.07-5.47 5.97-5.47 3.13 0 5.57 2.23 5.57 5.21 0 3.11-1.96 5.61-4.68 5.61-.91 0-1.77-.47-2.07-1.03l-.56 2.09c-.2.78-.75 1.76-1.12 2.36.85.26 1.74.4 2.67.4 5.52 0 10-4.48 10-10S17.52 2 12 2z"/></svg>
+        </a>
+        <a href="#" class="footer-social" aria-label="TikTok">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.32 6.32 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.69a8.18 8.18 0 004.78 1.52V6.76a4.85 4.85 0 01-1.01-.07z"/></svg>
+        </a>
+        <a href="#" class="footer-social" aria-label="LinkedIn">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="2" y="2" width="20" height="20" rx="4"/><path d="M8 11v5M8 8v.01M12 16v-5M12 11a3 3 0 016 0v5"/></svg>
+        </a>
+      </div>
+    </div>
+    <div class="footer-col">
+      <h4>COLLECTIONS</h4>
+      <ul class="footer-links">
+        <li><a href="#">Printemps-Été 2025</a></li>
+        <li><a href="#">Automne-Hiver 2024</a></li>
+        <li><a href="#">Capsule Collection</a></li>
+        <li><a href="#">Éditions Limitées</a></li>
+        <li><a href="#">Archives</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>SERVICES</h4>
+      <ul class="footer-links">
+        <li><a href="#">Stylisme Privé</a></li>
+        <li><a href="#">Location Pièces</a></li>
+        <li><a href="#">Atelier Retouches</a></li>
+        <li><a href="#">Click & Collect</a></li>
+        <li><a href="#">Carte Cadeau</a></li>
+      </ul>
+    </div>
+    <div class="footer-col">
+      <h4>MAISON</h4>
+      <ul class="footer-links">
+        <li><a href="#">Notre Histoire</a></li>
+        <li><a href="#">L'Atelier</a></li>
+        <li><a href="#">Presse</a></li>
+        <li><a href="#">Carrières</a></li>
+        <li><a href="#">Contact</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2025 MAISON NOIR — Tous droits réservés</p>
+    <ul class="footer-bottom-links">
+      <li><a href="#">Mentions légales</a></li>
+      <li><a href="#">Confidentialité</a></li>
+      <li><a href="#">CGV</a></li>
+      <li><a href="#">Cookies</a></li>
+    </ul>
+  </div>
+</footer>
+
+<script>
+// ── LOADER ──
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    document.getElementById('loader').classList.add('hidden');
+  }, 1900);
+});
+
+// ── CURSOR ──
+const cursor = document.getElementById('cursor');
+const follower = document.getElementById('cursorFollower');
+let fx = 0, fy = 0, mx = 0, my = 0;
+document.addEventListener('mousemove', e => {
+  mx = e.clientX; my = e.clientY;
+  cursor.style.left = mx - 6 + 'px';
+  cursor.style.top = my - 6 + 'px';
+});
+(function animFollower() {
+  fx += (mx - fx) * 0.12;
+  fy += (my - fy) * 0.12;
+  follower.style.left = fx - 20 + 'px';
+  follower.style.top = fy - 20 + 'px';
+  requestAnimationFrame(animFollower);
+})();
+document.querySelectorAll('a, button, .product-card, .lookbook-item, .service-item, .size-dot, .dot, .brand-logo').forEach(el => {
+  el.addEventListener('mouseenter', () => { cursor.classList.add('expand'); follower.classList.add('expand'); });
+  el.addEventListener('mouseleave', () => { cursor.classList.remove('expand'); follower.classList.remove('expand'); });
+});
+
+// ── SCROLL PROGRESS ──
+const bar = document.getElementById('scrollProgress');
+window.addEventListener('scroll', () => {
+  const s = document.documentElement.scrollTop;
+  const h = document.documentElement.scrollHeight - window.innerHeight;
+  bar.style.width = (s / h * 100) + '%';
+});
+
+// ── CAROUSEL ──
+const slides = document.querySelectorAll('.slide');
+const dots = document.querySelectorAll('.dot');
+const counter = document.getElementById('currentSlide');
+let current = 0, autoTimer;
+
+function goTo(n) {
+  slides[current].classList.remove('active');
+  dots[current].classList.remove('active');
+  current = (n + slides.length) % slides.length;
+  slides[current].classList.add('active');
+  dots[current].classList.add('active');
+  counter.textContent = String(current + 1).padStart(2, '0');
+}
+function next() { goTo(current + 1); }
+function prev() { goTo(current - 1); }
+
+document.getElementById('nextBtn').addEventListener('click', () => { next(); resetAuto(); });
+document.getElementById('prevBtn').addEventListener('click', () => { prev(); resetAuto(); });
+dots.forEach((d, i) => d.addEventListener('click', () => { goTo(i); resetAuto(); }));
+
+function resetAuto() { clearInterval(autoTimer); autoTimer = setInterval(next, 5500); }
+autoTimer = setInterval(next, 5500);
+
+// ── SCROLL REVEAL ──
+const revealEls = document.querySelectorAll('.reveal');
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); } });
+}, { threshold: 0.1 });
+revealEls.forEach(el => observer.observe(el));
+
+// ── TOAST ──
+const toast = document.getElementById('toast');
+function showToast(msg) {
+  toast.innerHTML = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 3200);
+}
+
+function addToCart(e, name) {
+  e.stopPropagation();
+  showToast(`<span>${name}</span> ajouté au panier ✦`);
+}
+function addWishlist(e) {
+  e.stopPropagation();
+  showToast('Article ajouté à votre <span>wishlist</span> ♥');
+}
+
+// ── NEWSLETTER ──
+function subscribeNewsletter() {
+  const val = document.getElementById('emailInput').value;
+  if (val && val.includes('@')) {
+    showToast('Bienvenue dans la <span>Maison Noir</span> — à très vite !');
+    document.getElementById('emailInput').value = '';
+  } else {
+    showToast('Entrez une adresse email <span>valide</span>.');
+  }
+}
+
+// ── PARALLAX on scroll ──
+window.addEventListener('scroll', () => {
+  const scrollY = window.scrollY;
+  document.querySelectorAll('.slide-bg').forEach(bg => {
+    bg.style.transform = `scale(1.08) translateY(${scrollY * 0.08}px)`;
+  });
+});
+</script>
+</body>
+</html>
